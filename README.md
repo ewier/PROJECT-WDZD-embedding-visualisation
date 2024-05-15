@@ -7,6 +7,6 @@ To run embedding and visualisation:
 6. Run embedding procedure and then indexing procedure
 
 
-To run app:
-pip install streamlit transformers elasticsearch umap-learn scikit-learn pandas
+To run app: \
+pip install streamlit transformers elasticsearch umap-learn scikit-learn pandas \
 streamlit run app/app.py --server.port 8502
