@@ -1,0 +1,8 @@
+streamlit >= 1.32.2
+transformers >= 4.35.2
+elasticsearch >= 8.13.1
+umap-learn >= 0.5.5
+scikit-learn >= 1.2.2
+pandas >= 2.0.3
+sentence_transformers >= 2.7.0
+json >= 2.0.9
