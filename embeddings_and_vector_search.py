@@ -16,6 +16,8 @@ class PropertiesLoader:
 class ModelOptions:
     # Here are all the supproted models
     MiniLM = "miniLM"
+    BERT = "bert"
+
 
 
 class EmbeddingModel:
@@ -31,6 +33,8 @@ class EmbeddingModel:
         initial_time = time.time()
         if self.model == ModelOptions.MiniLM:
             embedding = self._get_miniLM(document_text)
+        elif self.model == ModelOptions.BERT:
+            embedding = self._get_bert(document_text)
         else:
             raise Exception("This model name is not supported.")
         total_time = time.time() - initial_time
@@ -47,6 +51,13 @@ class EmbeddingModel:
         for text in texts:
             embeddings.append(model.encode(text))
         return embeddings
+    @staticmethod
+    def _get_bert(texts: list[str]):
+        model = SentenceTransformer('bert-base-nli-mean-tokens')
+        embeddings = []
+        for text in texts:
+            embeddings.append(model.encode(text))
+        return embeddings
 
 
 
@@ -54,12 +65,12 @@ class TextIndexer:
     def __init__(self) -> None:
         self.properties = PropertiesLoader.read_properties()
         user, password = self.properties['user'], self.properties['password']
-        self.client = Elasticsearch('https://localhost:9200', http_auth=(user, password), verify_certs=False)
+        self.client = Elasticsearch('http://localhost:9200', basic_auth=(user, password))
         self.BATCH_SIZE = self.properties['batch_size']
         self.INDEX_NAME = self.properties['index_name']
 
     def _create_index(self):
-        self.client.indices.delete(index=self.INDEX_NAME, ignore=[400, 404])
+        self.client.options(ignore_status=[400, 404]).indices.delete(index=self.INDEX_NAME)
         self.client.indices.create(index=self.INDEX_NAME)
 
     def _index_documents(self):

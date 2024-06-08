@@ -8,6 +8,8 @@ import streamlit as st
 import pandas as pd
 from sklearn.manifold import TSNE
 from umap import UMAP
+from pacmap import PaCMAP
+from trimap import TRIMAP
 from visualization import plot_embeddings
 from embeddings_and_vector_search import ModelOptions, EmbeddingModel
 
@@ -31,6 +33,10 @@ if st.button('Generuj wizualizację'):
         reducer = TSNE(n_components=2, perplexity=perplexity_value)
     elif method == 'UMAP':
         reducer = UMAP(n_components=2)
+    elif method == 'PaCMAP':
+        reducer = PaCMAP(n_components=2)
+    elif method == 'TriMAP':
+        reducer = TRIMAP(n_inliers=min(10, len(embeddings) - 2))
     else:
         st.write("Metoda nie jest jeszcze zaimplementowana")
 
