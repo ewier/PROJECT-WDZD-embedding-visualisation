@@ -3,6 +3,7 @@ import json
 import time
 from elasticsearch.helpers import bulk
 from sentence_transformers import SentenceTransformer
+from datasets import load_dataset
 
 
 class PropertiesLoader:
@@ -26,10 +27,15 @@ class EmbeddingModel:
         self.model = model_name
         self.properties = PropertiesLoader.read_properties()
 
+    def get_dataset(self):
+        dataset = load_dataset("gretelai/symptom_to_diagnosis")
+        full_dataset = dataset['train']
+        document_text = [ex['input_text'] for ex in full_dataset]
+        document_label = [ex['output_text'] for ex in full_dataset]
+        return document_text, document_label
+
     def get_embedding(self):
-        document_text = []
-        with open(self.properties["documents"]["document_file_path"], "r") as document_file:
-            document_text = document_file.readlines()
+        document_text, document_labels = self.get_dataset()
         initial_time = time.time()
         if self.model == ModelOptions.MiniLM:
             embedding = self._get_miniLM(document_text)
@@ -39,10 +45,14 @@ class EmbeddingModel:
             raise Exception("This model name is not supported.")
         total_time = time.time() - initial_time
         print(f'Documents embedding finished in {total_time} second(s)\n')
+        with open(self.properties["documents"]["document_file_path"], "w") as documents_file:
+            documents_file.write('\n'.join([str(i) for i in document_text]))
         with open(self.properties["documents"]["embedding_file_path"], "w") as embedding_file:
             for emb in embedding:
                 embedding_file.write(','.join([str(i) for i in emb]))
                 embedding_file.write('\n')
+        with open(self.properties["documents"]["labels_file_path"], "w") as label_file:
+            label_file.write('\n'.join([str(i) for i in document_labels]))
 
     @staticmethod
     def _get_miniLM(texts: list[str]):
@@ -73,29 +83,38 @@ class TextIndexer:
         self.client.options(ignore_status=[400, 404]).indices.delete(index=self.INDEX_NAME)
         self.client.indices.create(index=self.INDEX_NAME)
 
-    def _index_documents(self):
+    def _get_documents(self):
         document_source = self.properties['documents']['document_file_path']
         embedding_source = self.properties['documents']['embedding_file_path']
+        labels_source = self.properties['documents']['labels_file_path']
         with open(document_source, "r") as documents_file:
-            with open(embedding_source, "r") as vectors_file:
+            documnets_text = documents_file.readlines()
+        with open(embedding_source, "r") as embedding_file:
+            raw_embeddings = embedding_file.readlines()
+            embeddings = [[float(value) for value in line.split(',')] for line in raw_embeddings]
+        with open(labels_source, "r") as labels_file:
+            labels = labels_file.readlines()
+        return documnets_text, embeddings, labels
+
+    def _index_documents(self):
+        documnets_text, embeddings, labels = self._get_documents()
+        documents = []
+        for index, (document, vector, label) in enumerate(zip(documnets_text, embeddings, labels)):
+            doc = {
+                "_id": str(index),
+                "general_text": document,
+                "general_text_vector": vector,
+                "label": label
+            }
+            documents.append(doc)
+
+            if index % self.BATCH_SIZE == 0 and index != 0:
+                indexing = bulk(self.client, documents, index=self.INDEX_NAME)
                 documents = []
-                for index, (document, vector_string) in enumerate(zip(documents_file, vectors_file)):
-                    vector = [float(w) for w in vector_string.split(",")]
-
-                    doc = {
-                        "_id": str(index),
-                        "general_text": document,
-                        "general_text_vector": vector
-                    }
-                    documents.append(doc)
-
-                    if index % self.BATCH_SIZE == 0 and index != 0:
-                        indexing = bulk(self.client, documents, index=self.INDEX_NAME)
-                        documents = []
-                        print(f"Indexing failed for {len(indexing[1])} items")
-                if documents:
-                    bulk(self.client, documents, index=self.INDEX_NAME)
-                print("Finished")
+                print(f"Indexing failed for {len(indexing[1])} items")
+        if documents:
+            bulk(self.client, documents, index=self.INDEX_NAME)
+        print("Finished")
     
     def create_and_index(self):
         self._create_index()
