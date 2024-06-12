@@ -1,9 +1,6 @@
 import os
 import sys
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, parent_dir)
-
 import streamlit as st
 import pandas as pd
 from sklearn.manifold import TSNE
@@ -12,6 +9,9 @@ from pacmap import PaCMAP
 from trimap import TRIMAP
 from visualization import plot_embeddings
 from embeddings_and_vector_search import ModelOptions, EmbeddingModel
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
 
 st.title('Wizualizacja osadzeń tekstowych')
 
@@ -35,10 +35,8 @@ if st.button('Generuj wizualizację'):
         reducer = UMAP(n_components=2)
     elif method == 'PaCMAP':
         reducer = PaCMAP(n_components=2)
-    elif method == 'TriMAP':
+    else:  # method == 'TriMAP'
         reducer = TRIMAP(n_inliers=min(10, len(embeddings) - 2))
-    else:
-        st.write("Metoda nie jest jeszcze zaimplementowana")
 
     reduced_embeddings = reducer.fit_transform(embeddings.values)
     df = pd.DataFrame(reduced_embeddings, columns=['x', 'y'])
