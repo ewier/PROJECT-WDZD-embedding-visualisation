@@ -2,9 +2,6 @@ import os
 import sys
 import json
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, parent_dir)
-
 import streamlit as st
 import pandas as pd
 from sklearn.manifold import TSNE
@@ -13,6 +10,9 @@ from pacmap import PaCMAP
 from trimap import TRIMAP
 from visualization import plot_embeddings
 from embeddings_and_vector_search import ModelOptions, EmbeddingModel
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
 
 st.title('Wizualizacja osadzeń tekstowych')
 

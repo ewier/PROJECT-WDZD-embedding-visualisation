@@ -5,6 +5,7 @@
     "index_name": "vector_search_index",
     "documents": {
         "document_file_path": "docs/documents.txt",
-        "embedding_file_path": "docs/embeddings.txt"
+        "embedding_file_path": "docs/embeddings.txt",
+        "labels_file_path": "docs/labels.txt"
     }
 }
