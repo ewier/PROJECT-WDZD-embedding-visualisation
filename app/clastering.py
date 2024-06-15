@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans
-import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 
 class Clusterer:
@@ -12,9 +12,18 @@ class Clusterer:
         return self.model.fit_predict(embeddings[['x', 'y']])
 
 
-def plot_embeddings(df):
-    fig, ax = plt.subplots()
-    scatter = ax.scatter(df['x'], df['y'], c=df['label'])
-    legend1 = ax.legend(*scatter.legend_elements(), title="Classes")
-    ax.add_artist(legend1)
+def plot_embeddings(df, title='Plot'):
+    fig = px.scatter(
+        df, x='x', y='y', color='cluster',
+        hover_data=['label'],  #: True, 'x': False, 'y': False, 'cluster': False},
+        title=title,
+        color_continuous_scale=px.colors.sequential.Viridis
+    )
     return fig
+
+# def plot_embeddings(df):
+#     fig, ax = plt.subplots()
+#     scatter = ax.scatter(df['x'], df['y'], c=df['label'])
+#     legend1 = ax.legend(*scatter.legend_elements(), title="Classes")
+#     ax.add_artist(legend1)
+#     return fig

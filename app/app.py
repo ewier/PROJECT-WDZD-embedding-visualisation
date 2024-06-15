@@ -42,10 +42,12 @@ def get_dataset_embedding(model):
 
 model = EmbeddingModel(model_name=selected_model)
 model_name = get_dataset_embedding(selected_model)
-embeddings = pd.read_csv(model.properties["documents"][f"embedding_{model_name}_{selected_dataset}_file_path"],
-                         header=None)
+embeddings = pd.read_csv(model.properties["documents"][f"embedding_{model_name}_{selected_dataset}_file_path"], header=None)
+labels = pd.read_csv(model.properties["documents"][f"labels{selected_dataset}_file_path"], header=None, names=['label'])
 
 st.session_state['docs'] = embeddings
+st.session_state['labels'] = labels
+
 method = st.selectbox("Wybierz metodę redukcji wymiarów:", ['UMAP', 't-SNE', 'PaCMAP', 'TriMAP'])
 
 match method:
@@ -75,27 +77,32 @@ match method:
         reducer = TRIMAP(n_inliers=n_inliers, n_outliers=n_outliers, n_random=n_random, distance=distance)
 
 embeddings = st.session_state.get('docs', pd.DataFrame())
+labels = st.session_state.get('labels', pd.DataFrame())
+
+if not labels.empty:
+    labels.columns = ['label']
 
 reduced_embeddings = reducer.fit_transform(embeddings.values)
 df = pd.DataFrame(reduced_embeddings, columns=['x', 'y'])
+df['label'] = labels['label']
 
 if 'fig' not in st.session_state:
     st.session_state['fig'] = None
 
 
-def generate_plot(n_clusters):
-    df = st.session_state['df']
+def generate_plot(n_clusters, plot_title):
     clusterer = Clusterer(n_clusters=n_clusters)
-    df['label'] = clusterer.fit_predict(df)
-    fig = plot_embeddings(df)
+    df['cluster'] = clusterer.fit_predict(df)
+    fig = plot_embeddings(df, plot_title)
     st.session_state['fig'] = fig
 
 
 number_of_clusters = st.slider('Wybierz liczbę klastrów:', min_value=2, max_value=10, value=5)
-generate_plot(number_of_clusters)
+plot_title = st.text_input('Wprowadź tytuł wykresu', selected_dataset_name)
+generate_plot(number_of_clusters, plot_title)
 
 if st.session_state['fig']:
-    st.pyplot(st.session_state['fig'])
+    st.plotly_chart(st.session_state['fig'])
 
 if 'fig' in st.session_state:
     if st.button('Wybierz folder do zapisu obrazu'):
