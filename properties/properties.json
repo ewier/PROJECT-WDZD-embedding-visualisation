@@ -4,8 +4,23 @@
     "batch_size": 1024,
     "index_name": "vector_search_index",
     "documents": {
-        "document_file_path": "docs/documents.txt",
-        "embedding_file_path": "docs/embeddings.txt",
+        "document1_file_path": "docs/document1.txt",
+        "embedding_1_1_file_path": "docs/embedding_mini_1.txt",
+        "embedding_2_1_file_path": "docs/embedding_bert_1.txt",
+        "labels1_file_path": "docs/labels1.txt",
+
+        "document2_file_path": "docs/document2.txt",
+        "embedding_1_2_file_path": "docs/embedding_mini_2.txt",
+        "embedding_2_2_file_path": "docs/embedding_bert_2.txt",
+        "labels2_file_path": "docs/labels2.txt",
+
+        "document3_file_path": "docs/document3.txt",
+        "embedding_1_3_file_path": "docs/embedding_mini_3.txt",
+        "embedding_2_3_file_path": "docs/embedding_bert_3.txt",
+        "labels3_file_path": "docs/labels3.txt",
+
+        "document_file_path": "docs/document.txt",
+        "embedding_file_path": "docs/embedding.txt",
         "labels_file_path": "docs/labels.txt"
     }
 }

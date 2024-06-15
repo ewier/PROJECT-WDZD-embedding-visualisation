@@ -27,22 +27,23 @@ class EmbeddingModel:
         self.model = model_name
         self.properties = PropertiesLoader.read_properties()
 
-    def get_dataset(self):
-        dataset = load_dataset("gretelai/symptom_to_diagnosis")
+    def get_dataset(self, dataset_name):
+        dataset = load_dataset(dataset_name)
         full_dataset = dataset['train']
         document_text = [ex['input_text'] for ex in full_dataset]
         document_label = [ex['output_text'] for ex in full_dataset]
         return document_text, document_label
 
-    def get_embedding(self):
-        document_text, document_labels = self.get_dataset()
+    def get_embedding(self, dataset_name):
+        document_text, document_labels = self.get_dataset(dataset_name)
         initial_time = time.time()
-        if self.model == ModelOptions.MiniLM:
-            embedding = self._get_miniLM(document_text)
-        elif self.model == ModelOptions.BERT:
-            embedding = self._get_bert(document_text)
-        else:
-            raise Exception("This model name is not supported.")
+
+        match self.model:
+            case ModelOptions.MiniLM:
+                embedding = self._get_miniLM(document_text)
+            case ModelOptions.BERT:
+                embedding = self._get_bert(document_text)
+
         total_time = time.time() - initial_time
         print(f'Documents embedding finished in {total_time} second(s)\n')
         with open(self.properties["documents"]["document_file_path"], "w") as documents_file:
