@@ -1,6 +1,6 @@
 /docker-compose.yml
-/docs
 /README.md
 /test.py
 /test_embeddings.py
 /tmp.py
+**/__pycache__/*
