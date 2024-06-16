@@ -13,28 +13,43 @@ class PropertiesLoader:
         data = json.load(f)
         return data
 
-
 class ModelOptions:
-    # Here are all the supproted models
+    # Here are all the supported models
     MiniLM = "miniLM"
     BERT = "bert"
 
+class DatasetOptions:
+    # Here are all the supported datasets
+    Symptoms = 'gretelai/symptom_to_diagnosis'
+    Quotes = 'Abirate/english_quotes'
+    Reviews = 'codyburker/yelp_review_sampled'
 
 
 class EmbeddingModel:
 
-    def __init__(self, model_name):
+    def __init__(self, model_name, model_id):
         self.model = model_name
+        self.model_id = model_id
         self.properties = PropertiesLoader.read_properties()
 
     def get_dataset(self, dataset_name):
         dataset = load_dataset(dataset_name)
-        full_dataset = dataset['train']
-        document_text = [ex['input_text'] for ex in full_dataset]
-        document_label = [ex['output_text'] for ex in full_dataset]
+        match dataset_name:
+            case DatasetOptions.Symptoms:
+                full_dataset = dataset['train']
+                document_text = [ex['input_text'] for ex in full_dataset]
+                document_label = [ex['output_text'] for ex in full_dataset]
+            case DatasetOptions.Reviews:
+                full_dataset = dataset['train']
+                document_text = [ex['text'] for ex in full_dataset]
+                document_label = [ex['stars'] for ex in full_dataset]
+            case DatasetOptions.Quotes:
+                full_dataset = dataset['train']
+                document_text = [ex['quote'] for ex in full_dataset]
+                document_label = [ex['author'] for ex in full_dataset]            
         return document_text, document_label
 
-    def get_embedding(self, dataset_name):
+    def get_embedding(self, dataset_name, dataset_id):
         document_text, document_labels = self.get_dataset(dataset_name)
         initial_time = time.time()
 
@@ -46,13 +61,13 @@ class EmbeddingModel:
 
         total_time = time.time() - initial_time
         print(f'Documents embedding finished in {total_time} second(s)\n')
-        with open(self.properties["documents"]["document_file_path"], "w") as documents_file:
+        with open(self.properties["documents"][f"document{dataset_id}_file_path"], "w", encoding="utf-8") as documents_file:
             documents_file.write('\n'.join([str(i) for i in document_text]))
-        with open(self.properties["documents"]["embedding_file_path"], "w") as embedding_file:
+        with open(self.properties["documents"][f"embedding_{model_id}_{dataset_id}_file_path"], "w", encoding="utf-8") as embedding_file:
             for emb in embedding:
                 embedding_file.write(','.join([str(i) for i in emb]))
                 embedding_file.write('\n')
-        with open(self.properties["documents"]["labels_file_path"], "w") as label_file:
+        with open(self.properties["documents"][f"labels{dataset_id}_file_path"], "w", encoding="utf-8") as label_file:
             label_file.write('\n'.join([str(i) for i in document_labels]))
 
     @staticmethod
@@ -71,7 +86,6 @@ class EmbeddingModel:
         return embeddings
 
 
-
 class TextIndexer:
     def __init__(self) -> None:
         self.properties = PropertiesLoader.read_properties()
@@ -84,21 +98,21 @@ class TextIndexer:
         self.client.options(ignore_status=[400, 404]).indices.delete(index=self.INDEX_NAME)
         self.client.indices.create(index=self.INDEX_NAME)
 
-    def _get_documents(self):
-        document_source = self.properties['documents']['document_file_path']
-        embedding_source = self.properties['documents']['embedding_file_path']
-        labels_source = self.properties['documents']['labels_file_path']
-        with open(document_source, "r") as documents_file:
+    def _get_documents(self, sources):
+        document_source = sources['document_source']
+        embedding_source = sources['embedding_source']
+        labels_source = sources['labels_source']
+        with open(document_source, "r", encoding="utf-8") as documents_file:
             documnets_text = documents_file.readlines()
-        with open(embedding_source, "r") as embedding_file:
+        with open(embedding_source, "r", encoding="utf-8") as embedding_file:
             raw_embeddings = embedding_file.readlines()
             embeddings = [[float(value) for value in line.split(',')] for line in raw_embeddings]
-        with open(labels_source, "r") as labels_file:
+        with open(labels_source, "r", encoding="utf-8") as labels_file:
             labels = labels_file.readlines()
         return documnets_text, embeddings, labels
 
-    def _index_documents(self):
-        documnets_text, embeddings, labels = self._get_documents()
+    def _index_documents(self, sources):
+        documnets_text, embeddings, labels = self._get_documents(sources)
         documents = []
         for index, (document, vector, label) in enumerate(zip(documnets_text, embeddings, labels)):
             doc = {
@@ -117,10 +131,15 @@ class TextIndexer:
             bulk(self.client, documents, index=self.INDEX_NAME)
         print("Finished")
     
-    def create_and_index(self):
+    def create_and_index(self, model_id, dataset_id):
+        sources = {
+            "document_source": self.properties["documents"][f"document{dataset_id}_file_path"],
+            "embedding_source": self.properties["documents"][f"embedding_{model_id}_{dataset_id}_file_path"],
+            "labels_source": self.properties["documents"][f"labels{dataset_id}_file_path"],
+        }
         self._create_index()
         initial_time = time.time()
-        self._index_documents()
+        self._index_documents(sources)
         total_time = time.time() - initial_time
         print(f'Document indexing finished in {total_time} second(s)\n')
         
@@ -128,9 +147,14 @@ class TextIndexer:
 
 if __name__ == "__main__":
     # Embedding documents
-    model = EmbeddingModel(model_name=ModelOptions.MiniLM)
-    model.get_embedding()
-
+    datasets = [DatasetOptions.Symptoms, DatasetOptions.Quotes, DatasetOptions.Reviews]
+    models = [ModelOptions.BERT, ModelOptions.MiniLM]
+    # finish MiniLM
+    dataset_id, dataset_name = 3, DatasetOptions.Reviews
+    model_id, model_name = 2, ModelOptions.BERT
+    print(f"MODEL {model_id}, DATASET {dataset_id}")
+    model = EmbeddingModel(model_name=model_name, model_id=model_id)
+    model.get_embedding(dataset_name, dataset_id)
     # Indexing documents
     indexer = TextIndexer()
-    indexer.create_and_index()
+    indexer.create_and_index(model_id, dataset_id)

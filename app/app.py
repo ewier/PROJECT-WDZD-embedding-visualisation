@@ -18,8 +18,8 @@ from embeddings_and_vector_search import ModelOptions, EmbeddingModel
 
 dataset_names = {
     'gretelai/symptom_to_diagnosis': 1,
-    'inny': 2,
-    'inny jeszcze': 3
+    'Abirate/english_quotes': 2,
+    'Yelp/yelp_review_full': 3
 }
 
 st.title('Wizualizacja osadzeń tekstowych')
