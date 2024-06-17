@@ -1,3 +1,15 @@
+# About the project
+
+USING EMBEDDING TEXTS (E.G. CREATED AT 
+HUGGINGFACEEMBEDDINGS HELP) AND ANY DATABASE 
+VECTOR (NP. ELASTICSEARCH) CREATE IN STREAMLIT
+ A DASHBOARD THAT WILL VISUALIZE THESE SETTLEMENTS 
+UMAP, T-SNE, PACMAP, TRIMAP.
+
+The goal of this project is to build an app that visualises text datasets using embedding models, a vector database and tools such as UMAP, T-SNE, PACMAP, or TRIMAP. The app was created in streamlit and allows the user to choose a dataset, a model and a dimentionality reduction technique.
+
+# How to run
+
 To run embedding and visualisation:
 1. Install elasticsearch
 2. Modify properties.json - add your elasticsearch password and update the document paths to match your environment
@@ -9,5 +21,22 @@ To run app: \
 pip install streamlit transformers elasticsearch umap-learn scikit-learn pandas \
 streamlit run app/app.py --server.port 8502
 
-Dataset source:
-https://huggingface.co/datasets/gretelai/symptom_to_diagnosis
+
+# Datasets
+
+Dataset sources:
+
+## 1. Symptoms to diagnosis
+The symptom to diagnosis dataset is avaliable [here](https://huggingface.co/datasets/gretelai/symptom_to_diagnosis)
+
+The dataset maps a symptom description to a diagnosis.
+
+## 2. English quotes
+The english quotes dataset is avaliable [here](https://huggingface.co/datasets/Abirate/english_quotes). 
+
+It contains quotes from famous people in English and the corresponding author.
+
+## 3. Yelp reviews
+The yelp reviews dataset is avaliable [here](https://huggingface.co/datasets/codyburker/yelp_review_sampled)
+
+The dataset has reviews written on Yelp and the corresponding 1 to 5 star review.
