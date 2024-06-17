@@ -7,7 +7,7 @@ from sklearn.manifold import TSNE
 from umap import UMAP
 from pacmap import PaCMAP
 from trimap import TRIMAP
-from clastering import Clusterer, plot_embeddings
+from clastering import Clusterer, plot_embeddings, plot_labels
 import tkinter as tk
 from tkinter import filedialog
 
@@ -81,7 +81,6 @@ if 'docs' in st.session_state and 'labels' in st.session_state:
     def generate_plot(n_clusters, plot_title):
         embeddings = st.session_state.get('docs', pd.DataFrame())
         labels = st.session_state.get('labels', pd.DataFrame())
-
         if not labels.empty:
             labels.columns = ['label']
 
@@ -93,10 +92,12 @@ if 'docs' in st.session_state and 'labels' in st.session_state:
         df['cluster'] = clusterer.fit_predict(df)
         fig = plot_embeddings(df, plot_title)
         st.session_state['fig'] = fig
+        st.session_state['label_fig'] = plot_labels(df, plot_title)
 
     if st.button('Generuj wykres'):
         generate_plot(number_of_clusters, plot_title)
 
         if st.session_state['fig']:
             st.plotly_chart(st.session_state['fig'])
+            st.plotly_chart(st.session_state['label_fig'])
 

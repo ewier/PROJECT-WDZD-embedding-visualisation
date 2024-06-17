@@ -21,6 +21,15 @@ def plot_embeddings(df, title='Plot'):
     )
     return fig
 
+def plot_labels(df, title='Plot'):
+    fig = px.scatter(
+        df, x='x', y='y',
+        hover_data=['label'],  #: True, 'x': False, 'y': False, 'cluster': False},
+        title=title,
+        color=df['label']
+    )
+    return fig
+
 # def plot_embeddings(df):
 #     fig, ax = plt.subplots()
 #     scatter = ax.scatter(df['x'], df['y'], c=df['label'])
