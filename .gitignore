@@ -4,3 +4,4 @@
 /test_embeddings.py
 /tmp.py
 **/__pycache__/*
+.venv/
