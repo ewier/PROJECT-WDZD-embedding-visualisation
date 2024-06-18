@@ -66,8 +66,7 @@ if 'docs' in st.session_state and 'labels' in st.session_state:
         n_neighbors = st.slider('Number of Neighbors', min_value=2, max_value=len(st.session_state['docs']) - 1, value=2)
         MN_ratio = st.slider('MN Ratio', min_value=0.1, max_value=1.0, value=0.5)
         FP_ratio = st.slider('FP Ratio', min_value=1.0, max_value=2.0, value=2.0)
-        init = st.selectbox('Initialization Method', ['random', 'pca'])
-        reducer = PaCMAP(n_components=2, n_neighbors=n_neighbors, MN_ratio=MN_ratio, FP_ratio=FP_ratio, init=init)
+        reducer = PaCMAP(n_components=2, n_neighbors=n_neighbors, MN_ratio=MN_ratio, FP_ratio=FP_ratio)
     elif method == 'TriMAP':
         n_inliers = st.slider('Number of Inliers', min_value=5, max_value=len(st.session_state['docs']) - 1, value=5)
         n_outliers = st.slider('Number of Outliers', min_value=5, max_value=len(st.session_state['docs']) - 1, value=5)
