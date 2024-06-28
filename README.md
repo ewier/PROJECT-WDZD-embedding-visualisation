@@ -17,10 +17,17 @@ To run embedding and visualisation:
 6. Run embedding procedure and then indexing procedure
 
 
-To run app: \
-pip install streamlit transformers elasticsearch umap-learn scikit-learn pandas \
-streamlit run app/app.py --server.port 8502
+To run app: 
+```
+pip install -r requirements.txt
+streamlit run app.py --server.port 8502
+```
 
+lub z Dockerfile:
+```
+docker build -t my-streamlit-app .
+docker run -p 8502:8502 my-streamlit-app
+```
 
 # Datasets
 
