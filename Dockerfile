@@ -1,6 +1,11 @@
 FROM python:3.9
-WORKDIR /app
-COPY requirements.txt
+
+WORKDIR .
+
+COPY requirements.txt /app/
+
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["streamlit", "run", "--server.port", "8502", "--server.address", "0.0.0.0", "streamlit_dashboard.py"]
+
+COPY . /app/
+
+CMD ["streamlit", "run", "--server.port", "8502", "app/app.py"]

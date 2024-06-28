@@ -28,15 +28,14 @@ class DatasetOptions:
 
 
 def get_dataset(dataset_name):
-    global document_text, document_label
+    global document_text
     dataset = load_dataset(dataset_name)
+    full_dataset = dataset['train']
     match dataset_name:
         case DatasetOptions.Symptoms:
-            full_dataset = dataset['train']
             document_text = [ex['input_text'] for ex in full_dataset]
             document_label = [ex['output_text'] for ex in full_dataset]
         case DatasetOptions.Quotes:
-            full_dataset = dataset['train']
             document_text = [ex['quote'] for ex in full_dataset]
             document_label = [ex['author'] for ex in full_dataset]
     return document_text, document_label
