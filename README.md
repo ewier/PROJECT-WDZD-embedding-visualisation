@@ -20,7 +20,7 @@ To run embedding and visualisation:
 To run app: 
 ```
 pip install -r requirements.txt
-streamlit run app.py --server.port 8502
+streamlit run app/app.py --server.port 8502
 ```
 
 lub z Dockerfile:
