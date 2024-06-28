@@ -150,7 +150,7 @@ if __name__ == "__main__":
     datasets = [DatasetOptions.Symptoms, DatasetOptions.Quotes, DatasetOptions.Reviews]
     models = [ModelOptions.BERT, ModelOptions.MiniLM]
     # finish MiniLM
-    dataset_id, dataset_name = 3, DatasetOptions.Reviews
+    dataset_id, dataset_name = 4, DatasetOptions.Reviews
     model_id, model_name = 2, ModelOptions.BERT
     print(f"MODEL {model_id}, DATASET {dataset_id}")
     model = EmbeddingModel(model_name=model_name, model_id=model_id)

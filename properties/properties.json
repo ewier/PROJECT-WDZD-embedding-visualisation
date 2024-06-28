@@ -1,6 +1,6 @@
 {
     "user": "elastic",
-    "password": "bU6RDD2yn0K4fmx1PqwT",
+    "password": "wdzd2024",
     "batch_size": 1024,
     "index_name": "vector_search_index",
     "documents": {
@@ -18,6 +18,11 @@
         "embedding_1_3_file_path": "docs/embedding_mini_3.txt",
         "embedding_2_3_file_path": "docs/embedding_bert_3.txt",
         "labels3_file_path": "docs/labels3.txt",
+
+        "document4_file_path": "docs/document4.txt",
+        "embedding_1_4_file_path": "docs/embedding_mini_4.txt",
+        "embedding_2_4_file_path": "docs/embedding_bert_4.txt",
+        "labels4_file_path": "docs/labels4.txt",
 
         "document_file_path": "docs/document.txt",
         "embedding_file_path": "docs/embedding.txt",
