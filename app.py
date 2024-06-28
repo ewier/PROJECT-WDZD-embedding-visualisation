@@ -1,5 +1,3 @@
-import os
-import sys
 import streamlit as st
 import pandas as pd
 from sklearn.manifold import TSNE
@@ -7,10 +5,6 @@ from umap import UMAP
 from pacmap import PaCMAP
 from trimap import TRIMAP
 from clastering import Clusterer, plot_embeddings, plot_labels
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, parent_dir)
-
 from embeddings_and_vector_search import ModelOptions, DatasetOptions, EmbeddingModel
 
 dataset_names = {
