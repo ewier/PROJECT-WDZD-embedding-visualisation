@@ -66,7 +66,7 @@ def configure_reducer(method, docs_length):
     if method == 'UMAP':
         n_neighbors = st.slider('Number of Neighbors', min_value=2, max_value=docs_length - 1, value=2)
         min_dist = st.slider('Minimum Distance', min_value=0.0, max_value=1.0, value=0.1)
-        spread = st.slider('Spread', min_value=1.0, max_value=5.0, value=1.0)
+        spread = st.slider('Spread', min_value=0.5, max_value=5.0, value=1.0)
         metric = st.selectbox('Distance Metric', ['euclidean', 'manhattan', 'cosine'])
         return UMAP(n_components=2, n_neighbors=n_neighbors, min_dist=min_dist, spread=spread, metric=metric)
 
@@ -110,7 +110,7 @@ def main():
         method = select_reduction_method()
         reducer = configure_reducer(method, len(st.session_state['docs']))
 
-        number_of_clusters = st.slider('Wybierz liczbę klastrów:', min_value=2, max_value=10, value=5)
+        number_of_clusters = st.slider('Wybierz liczbę klastrów:', min_value=2, max_value=100, value=5)
         plot_title = st.text_input('Wprowadź tytuł wykresu', '{} {} {}'.format(method, "Projection of",
                                                                                list(dataset_names.keys())[
                                                                                    list(dataset_names.values()).index(
