@@ -21,6 +21,7 @@ def plot_embeddings(df, title='Plot'):
     )
     return fig
 
+
 def plot_labels(df, title='Plot'):
     fig = px.scatter(
         df, x='x', y='y',
@@ -29,10 +30,3 @@ def plot_labels(df, title='Plot'):
         color=df['label']
     )
     return fig
-
-# def plot_embeddings(df):
-#     fig, ax = plt.subplots()
-#     scatter = ax.scatter(df['x'], df['y'], c=df['label'])
-#     legend1 = ax.legend(*scatter.legend_elements(), title="Classes")
-#     ax.add_artist(legend1)
-#     return fig
